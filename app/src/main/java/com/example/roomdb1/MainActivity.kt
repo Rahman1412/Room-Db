@@ -1,5 +1,6 @@
 package com.example.roomdb1
 
+import android.database.CursorWindow
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,7 +28,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RoomDb1Theme {
-
+                try {
+                    val field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
+                    field.isAccessible = true
+                    field.set(null, 100 * 1024 * 1024) // the 100MB is the new size
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
                 AppRouting()
             }
         }

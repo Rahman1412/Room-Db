@@ -10,5 +10,4 @@ class UserRepo(private val userdao : UserDao) {
     }
 
     fun getUser(): Flow<List<User>> =  userdao.getUser()
-
 }

@@ -77,8 +77,6 @@ fun UserDialog(alertAction : (Boolean) -> Unit){
             vm.setImage(bitmap)
         }
     }
-
-
     
     Dialog(onDismissRequest = { }) {
         Card {
@@ -131,7 +129,9 @@ fun UserDialog(alertAction : (Boolean) -> Unit){
                             }
 
                         },
-                        modifier = Modifier.align(Alignment.Center).padding(start = 60.dp, top = 25.dp)
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(start = 70.dp)
                     ) {
                         Icon(
                             painter = painterResource(
@@ -143,13 +143,13 @@ fun UserDialog(alertAction : (Boolean) -> Unit){
                                         R.drawable.trash
                                     }
                                 }
-
                             ),
                             contentDescription = "Camera",
                             modifier = Modifier.size(30.dp)
                         )
                     }
                 }
+
                 OutlinedTextField(
                     value = username.toString(),
                     onValueChange = {
@@ -160,7 +160,9 @@ fun UserDialog(alertAction : (Boolean) -> Unit){
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 SpacerHeight(space = 10.dp)
+
                 OutlinedTextField(
                     value = email.toString(),
                     onValueChange = {
@@ -171,7 +173,9 @@ fun UserDialog(alertAction : (Boolean) -> Unit){
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 SpacerHeight(space = 10.dp)
+
                 Button(
                     onClick = {
                               vm.addUser()

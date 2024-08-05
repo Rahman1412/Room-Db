@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,12 +41,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.roomdb1.R
+import com.example.roomdb1.models.Employee
 import com.example.roomdb1.models.User
 import com.example.roomdb1.screens.components.UserDialog
 import com.example.roomdb1.viewModels.UserVM
@@ -55,6 +61,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun HomeScreen(){
     val context = LocalContext.current.applicationContext
+    val lifecycleOwner : LifecycleOwner = LocalLifecycleOwner.current
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -76,8 +83,23 @@ fun HomeScreen(){
         isDialog = value
     }
 
-    val allUser by vm.allUser.collectAsState(initial = listOf())
+    val allUser by vm.allUser.collectAsState(initial = emptyList())
+    val allEmployee by vm.allEmployee.collectAsState(initial = emptyList())
 
+    DisposableEffect(lifecycleOwner) {
+
+        val observer = LifecycleEventObserver{ _,event ->
+            if (event == Lifecycle.Event.ON_START) {
+                Log.d("Started","Started")
+            } else if (event == Lifecycle.Event.ON_STOP) {
+                Log.d("Stopped","Stopped")
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -109,7 +131,9 @@ fun HomeScreen(){
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-
+                allEmployee.forEach { item ->
+                    Employee(item)
+                }
                 allUser.forEach { item ->
                     User(item)
                 }
@@ -135,7 +159,31 @@ fun User(user: User){
                 modifier = Modifier.padding(10.dp)
             ) {
                 Text(text = user.id.toString())
-                Text(text = user.username)
+                Text(text = "USER "+user.username)
+                Text(text = user.email)
+            }
+        }
+    }
+}
+
+@Composable
+fun Employee(user: Employee){
+    val context = LocalContext.current
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+    ){
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(bitmap = user.image?.asImageBitmap()!!, contentDescription = "", modifier = Modifier.size(100.dp))
+            Column(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Text(text = user.id.toString())
+                Text(text = "EMP "+user.username)
                 Text(text = user.email)
             }
         }
